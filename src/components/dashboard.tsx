@@ -93,7 +93,7 @@ export default async function Dashboard({ mode }: { mode: number }) {
           <Link href={"/dashboard/3days"}>3 Days</Link>
         </Button>
       </div>
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 w-full px-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 w-full px-1 lg:px-8">
         <Chart
           data={sensor}
           config={chartConfigSuhu}

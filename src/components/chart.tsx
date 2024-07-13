@@ -23,17 +23,17 @@ export function Chart(props: ChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{props.chartTitle}</CardTitle>
+        <CardTitle className="text-xl md:text-2xl">{props.chartTitle}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-1 md:p-6">
         <ChartContainer config={props.config}>
           <LineChart
             accessibilityLayer
             data={props.data}
             margin={{
-              top: 20,
-              left: 10,
-              right: 12,
+              top: 10,
+              left: 5,
+              right: 6,
             }}
           >
             <CartesianGrid vertical={true} />
