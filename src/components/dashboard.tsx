@@ -8,8 +8,6 @@ import { ChartConfig } from "@/components/ui/chart";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
-export const revalidate = 10;
-
 export type SensorData = {
   suhu: number;
   tds: number;
