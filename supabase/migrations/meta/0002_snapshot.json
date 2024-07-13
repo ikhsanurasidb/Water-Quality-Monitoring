@@ -1,0 +1,56 @@
+{
+  "id": "a73ee0a4-0d44-40ae-af2d-4d273f276e4d",
+  "prevId": "47427121-2d43-4de5-805c-9de74528177a",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.sensor_table": {
+      "name": "sensor_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "suhu": {
+          "name": "suhu",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tds": {
+          "name": "tds",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ph": {
+          "name": "ph",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
