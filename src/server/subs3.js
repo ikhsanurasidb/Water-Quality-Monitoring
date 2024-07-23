@@ -90,7 +90,6 @@ const dotenv_1 = require("dotenv");
 const postgres_js_1 = require("drizzle-orm/postgres-js");
 const postgres_1 = __importDefault(require("postgres"));
 const pg_core_1 = require("drizzle-orm/pg-core");
-const { on } = require("events");
 (0, dotenv_1.config)({ path: ".env" });
 const client = (0, postgres_1.default)(process.env.DATABASE_URL);
 const db = (0, postgres_js_1.drizzle)(client);
@@ -112,60 +111,42 @@ const keyPath = path.resolve(process.env.KEY_PATH);
 const certPath = path.resolve(process.env.CERT_PATH);
 const caPath = path.resolve(process.env.CA_PATH);
 const endpoint = process.env.AWS_IOT_ENDPOINT;
-
 const device = new mqtt.device({
   keyPath: keyPath,
   certPath: certPath,
   caPath: caPath,
-  clientId: "mqtt-client-99",
+  clientId: "mqtt-client",
   host: endpoint,
-  reconnectPeriod: 1000,  // Reconnect every 1 second
-  keepalive: 60,  // Send keepalive packets every 60 seconds
-  protocol: 'mqtts',  // Use secure MQTT
 });
 
-device.on("connect", () => {
+device.once("connect", () => {
   console.log("Connected to AWS IoT");
-  device.subscribe("esp32/pub", { qos: 1 }, (error, granted) => {
-    if (error) {
-      console.error("Subscription error:", error);
-    } else {
-      console.log("Subscription granted:", granted);
-    }
-  });
+  device.subscribe("esp32/pub");
 });
 
 device.on("message", (topic, payload) =>
   __awaiter(void 0, void 0, void 0, function* () {
     console.log("Received message from topic:", topic);
-    let data;
-    try {
-      data = JSON.parse(payload.toString());
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-      return;
-    }
-  
-    console.log("Message data:", data);
-  
+    const data = JSON.parse(payload.toString());
+    console.log(data);
     const schema = zod_1.z.object({
       suhu: zod_1.z.coerce.number().transform((val) => Math.max(val, 0)),
       tds: zod_1.z.coerce.number().transform((val) => Math.max(val, 0)),
       ph: zod_1.z.coerce.number().transform((val) => Math.max(val, 0)),
     });
-  
-    const validatedData = schema.safeParse(data);
+    const validatedData = schema.safeParse({
+      suhu: data.suhu,
+      tds: data.tds,
+      ph: data.ph,
+    });
     if (!validatedData.success) {
-      console.error("Validation error:", validatedData.error);
-      return;
+      console.error(validatedData.error);
     }
-  
     const sensor = {
       suhu: validatedData.data.suhu,
       tds: validatedData.data.tds,
       ph: validatedData.data.ph,
     };
-  
     try {
       yield insertSensorData(sensor);
     } catch (error) {
@@ -176,24 +157,4 @@ device.on("message", (topic, payload) =>
 
 device.on("error", (error) => {
   console.error("Error:", error);
-});
-
-device.on("error", (error) => {
-  console.error("MQTT Error:", error);
-});
-
-device.on("close", () => {
-  console.log("Connection closed");
-});
-
-device.on("reconnect", () => {
-  console.log("Reconnecting to AWS IoT...");
-});
-
-device.on("offline", () => {
-  console.log("Device is offline");
-});
-
-device.on("end", () => {
-  console.log("Connection ended");
 });

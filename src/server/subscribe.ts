@@ -58,6 +58,7 @@ device.on("connect", () => {
 });
 
 device.on("message", async (topic, payload: SensorData) => {
+  console.log("Received message from topic:", topic);
   const data = JSON.parse(payload.toString());
   console.log(data);
   console.log(typeof data);
