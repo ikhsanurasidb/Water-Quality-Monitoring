@@ -178,10 +178,6 @@ device.on("error", (error) => {
   console.error("Error:", error);
 });
 
-device.on("error", (error) => {
-  console.error("MQTT Error:", error);
-});
-
 device.on("close", () => {
   console.log("Connection closed");
 });
@@ -192,8 +188,4 @@ device.on("reconnect", () => {
 
 device.on("offline", () => {
   console.log("Device is offline");
-});
-
-device.on("end", () => {
-  console.log("Connection ended");
 });
