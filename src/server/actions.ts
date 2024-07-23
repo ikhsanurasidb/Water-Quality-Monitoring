@@ -3,6 +3,7 @@ import * as mqtt from "aws-iot-device-sdk";
 import { config } from "dotenv";
 import { DeviceStatus } from "@/components/device-status";
 import { unstable_noStore as noStore } from "next/cache";
+import { getWIBTime } from "@/lib/utils";
 
 config({ path: path.join(__dirname, "../../.env") });
 
@@ -48,6 +49,7 @@ export async function getDeviceStatus(): Promise<DeviceStatus | undefined> {
       }
       
       console.log("Device status:", data);
+      console.log("WIB Time", getWIBTime());
 
       const deviceStatus: DeviceStatus = {
         status: data.status || 'Unknown',
