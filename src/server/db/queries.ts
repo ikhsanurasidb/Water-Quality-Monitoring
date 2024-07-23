@@ -113,3 +113,39 @@ export const getSensorForLast3Days = async (): Promise<
     return [];
   }
 };
+
+export const getSensorForLast1Week = async (): Promise<
+  Array<{
+    id: number;
+    suhu: number;
+    tds: number;
+    ph: number;
+    createdAt: Date;
+  }>
+> => {
+  try {
+    const res = await db
+      .select({
+        id: sensorTable.id,
+        suhu: sensorTable.suhu,
+        tds: sensorTable.tds,
+        ph: sensorTable.ph,
+        createdAt: sensorTable.createdAt,
+      })
+      .from(sensorTable)
+      .where(
+        between(
+          sensorTable.createdAt,
+          sql`now() - interval '1 week'`,
+          sql`now()`
+        )
+      )
+      .orderBy(asc(sensorTable.createdAt), asc(sensorTable.id));
+
+    return res;
+  } catch (e) {
+    console.error(e);
+
+    return [];
+  }
+};

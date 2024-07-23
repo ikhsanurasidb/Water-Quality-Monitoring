@@ -1,4 +1,5 @@
 import {
+  getSensorForLast1Week,
   getSensorForLast24Hours,
   getSensorForLast2Days,
   getSensorForLast3Days,
@@ -7,6 +8,11 @@ import { Chart } from "@/components/chart";
 import { ChartConfig } from "@/components/ui/chart";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import * as path from "path";
+import * as mqtt from "aws-iot-device-sdk";
+import { config } from "dotenv";
+
+config({ path: path.join(__dirname, "../../.env") });
 
 export type SensorData = {
   suhu: number;
@@ -52,13 +58,52 @@ const chartConfigPh = {
 } satisfies ChartConfig;
 
 export default async function Dashboard({ mode }: { mode: number }) {
+  let isDeviceOn = false;
+
+  const keyPath = path.resolve(process.env.KEY_PATH!);
+  const certPath = path.resolve(process.env.CERT_PATH!);
+  const caPath = path.resolve(process.env.CA_PATH!);
+  const endpoint = process.env.AWS_IOT_ENDPOINT;
+
+  console.log(keyPath, certPath, caPath, endpoint)
+
+  const device = new mqtt.device({
+    keyPath: keyPath,
+    certPath: certPath,
+    caPath: caPath,
+    clientId: "mqtt-client",
+    host: endpoint,
+  });
+
+  device.on("connect", () => {
+    console.log("Connected to AWS IoT");
+    device.subscribe("esp32/isDeviceOn");
+  });
+
+  device.on("message", async (topic, payload: SensorData) => {
+    const status = JSON.parse(payload.toString());
+    console.log("Device status:", status);
+
+    if (status === "ON") {
+      isDeviceOn = true;
+    } else {
+      isDeviceOn = false;
+    }
+  });
+
+  device.on("error", (error) => {
+    console.error("Error:", error);
+  });
+
   let res;
   if (mode === 1) {
     res = await getSensorForLast24Hours();
   } else if (mode === 2) {
     res = await getSensorForLast2Days();
-  } else {
+  } else if (mode === 3) {
     res = await getSensorForLast3Days();
+  } else {
+    res = await getSensorForLast1Week();
   }
 
   const sensor: SensorData[] = res.map((r) => {
@@ -92,6 +137,12 @@ export default async function Dashboard({ mode }: { mode: number }) {
         <Button>
           <Link href={"/dashboard/3days"}>3 Days</Link>
         </Button>
+        <Button>
+          <Link href={"/dashboard/1week"}>1 Week</Link>
+        </Button>
+      </div>
+      <div className="flex gap-2 items-center justify-center">
+        <p>Device Status: {isDeviceOn ? "ON" : "OFF"}</p>
       </div>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 w-full px-1 lg:px-8">
         <Chart

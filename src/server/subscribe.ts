@@ -26,7 +26,6 @@ const sensorTable = pgTable("sensor_table", {
 });
 
 type InsertSensor = typeof sensorTable.$inferInsert;
-type SelectSensor = typeof sensorTable.$inferSelect;
 
 async function insertSensorData(data: InsertSensor) {
   await db.insert(sensorTable).values(data);
@@ -37,8 +36,6 @@ type SensorData = {
   tds: number;
   ph: number;
 };
-
-// Kode diatas untuk setup drizzle-orm dan membuat schema untuk tabel sensor_table.
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
