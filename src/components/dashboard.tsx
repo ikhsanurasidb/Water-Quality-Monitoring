@@ -77,7 +77,7 @@ export default async function Dashboard({ mode }: { mode: number }) {
 
   device.on("connect", () => {
     console.log("Connected to AWS IoT");
-    device.subscribe("esp32/isDeviceOn");
+    device.subscribe("esp32/device_status");
   });
 
   device.on("message", async (topic, payload: SensorData) => {
