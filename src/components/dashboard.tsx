@@ -71,7 +71,7 @@ export default async function Dashboard({ mode }: { mode: number }) {
     keyPath: keyPath,
     certPath: certPath,
     caPath: caPath,
-    clientId: "mqtt-client",
+    clientId: "mqtt-client-device-status-monitor",
     host: endpoint,
   });
 
